@@ -16,5 +16,9 @@
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "apollo-server": "^2.20.0",
+    "apollo-server-express": "^2.20.0",
+    "graphql": "^15.5.0"
+  }
 }
