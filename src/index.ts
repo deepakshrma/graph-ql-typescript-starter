@@ -1,19 +1,12 @@
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
+
+import typeDefs from "./typeDefs";
+
 const app = express();
 
 const PORT = process.env.PORT || 4000;
-const typeDefs = `
-type User {
-  firstname: String
-  lastname: String
-  age: Int
-  address: String
-}
-type Query {
-  users:[User]
-}
-`;
+
 const resolvers = {
   Query: {
     users: () => [],
