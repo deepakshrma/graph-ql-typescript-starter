@@ -1,3 +1,4 @@
+require("dotenv").config({ path: `.env.${process.env.NODE_ENV || "dev"}` });
 import { ApolloServer } from "apollo-server-express";
 
 import express from "express";
@@ -8,7 +9,9 @@ import bodyParser from "body-parser";
 import typeDefs from "./typeDefs";
 import resolvers from "./resolvers";
 import { init } from "./models/database";
+// Init database
 init();
+
 import models from "./models/";
 import logger from "./middlewares/logger";
 import initRoutes from "./routes";
@@ -26,7 +29,7 @@ const server = new ApolloServer({
 });
 
 if (process.env.NODE_ENV === "dev") {
-  // Do something extra here 
+  // Do something extra here
 
   app.use(logger);
   app.get("/health", (_, res) => {
