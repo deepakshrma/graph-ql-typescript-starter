@@ -3,6 +3,9 @@ import express from "express";
 
 import typeDefs from "./typeDefs";
 import resolvers from "./resolvers";
+import { init } from "./models/database";
+init();
+import models from "./models/";
 
 const app = express();
 
@@ -11,6 +14,9 @@ const PORT = process.env.PORT || 4000;
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: () => ({
+    models,
+  }),
 });
 
 server.applyMiddleware({ app });
