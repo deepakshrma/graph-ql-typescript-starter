@@ -1,11 +1,6 @@
+import { User } from "../interfaces/User";
 import { all, run } from "./database";
 
-interface User {
-  firstname: string;
-  lastname: string;
-  age: number;
-  address?: string;
-}
 const TABLE_NAME = "users";
 
 const createUser = async (user: User) => {
@@ -19,4 +14,4 @@ const getUsers = async () => {
     `SELECT rowid as id,firstname,lastname,age FROM ${TABLE_NAME}`
   );
 };
-export default { createUser , getUsers };
+export default { createUser, getUsers };

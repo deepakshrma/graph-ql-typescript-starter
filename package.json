@@ -18,6 +18,7 @@
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
     "@types/compression": "^1.7.0",
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/morgan": "^1.9.2",
     "@types/sqlite3": "^3.1.7",
     "husky": "^5.0.9",
@@ -35,6 +36,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "graphql": "^15.5.0",
+    "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "sqlite3": "^5.0.1"
   },

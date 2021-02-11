@@ -1,15 +1,20 @@
 // src/resolvers/users.ts
 
-import { Models } from "../models/";
+import { AppContext } from "../interfaces/AppContext";
 
 const resolvers = {
   Query: {
-    users: async (_: any, __: any, { models }: Models) => {
+    users: async (_: any, __: any, { models }: AppContext) => {
       return await models.User.getUsers();
     },
   },
   Mutation: {
-    createUser: async (_: any, { input: user }: any, { models }: Models) => {
+    createUser: async (
+      _: any,
+      { input: user }: any,
+      { models, me }: AppContext
+    ) => {
+      console.info("User info", me);
       const { id } = await models.User.createUser(user);
       return { ...user, id };
     },
