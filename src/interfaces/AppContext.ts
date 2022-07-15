@@ -5,4 +5,5 @@ export interface AppContext {
     User: typeof UserModel;
   };
   me: any;
+  secret: string;
 }

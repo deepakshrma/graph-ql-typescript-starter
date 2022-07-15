@@ -1,37 +1,42 @@
 require("dotenv").config({ path: `.env.${process.env.NODE_ENV || "dev"}` });
-import jwt from "jsonwebtoken";
 import { ApolloServer } from "apollo-server-express";
-import express from "express";
-import cors from "cors";
-import compression from "compression";
 import bodyParser from "body-parser";
-
-import typeDefs from "./typeDefs";
-import resolvers from "./resolvers";
+import compression from "compression";
+import cors from "cors";
+import express from "express";
+import jwt from "jsonwebtoken";
+import { plugins } from "./config/apollo";
+import logger from "./middlewares/logger";
+import models from "./models/";
 import { init } from "./models/database";
+import resolvers from "./resolvers";
+import initRoutes from "./routes";
+import typeDefs from "./typeDefs";
 // Init database
 init();
 
-import models from "./models/";
-import logger from "./middlewares/logger";
-import initRoutes from "./routes";
-
 const app = express();
-
 const PORT = process.env.PORT || 4000;
+const JWT_SECRET = process.env.JWT_SECRET;
+function getLoginUser(req: express.Request) {
+  const token = req.headers["x-auth-token"] as string;
+  if (token) {
+    try {
+      return jwt.verify(token, JWT_SECRET as string);
+    } catch (error) {
+      throw Error("Session Expired!!");
+    }
+  }
+}
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: ({ req }) => ({
-    models,
-    me: getLoginUser(req),
-  }),
-});
+function shouldCompress(req: express.Request, res: express.Response) {
+  return req.headers["cache-control"] === "no-cache"
+    ? false
+    : compression.filter(req, res);
+}
 
 if (process.env.NODE_ENV === "dev") {
   // Do something extra here
-
   app.use(logger);
   app.get("/health", (_, res) => {
     res.send({
@@ -44,27 +49,27 @@ if (process.env.NODE_ENV === "dev") {
 app.use(cors());
 app.use(compression({ filter: shouldCompress }));
 app.use(bodyParser.json());
+app.use(express.static("public"));
 
 initRoutes(app);
-server.applyMiddleware({ app });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
-});
-
-function shouldCompress(req: express.Request, res: express.Response) {
-  return req.headers["cache-control"] === "no-cache"
-    ? false
-    : compression.filter(req, res);
+async function startServer() {
+  const apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => ({
+      secret: JWT_SECRET,
+      models,
+      me: getLoginUser(req),
+    }),
+    plugins: plugins,
+  });
+  await apolloServer.start();
+  apolloServer.applyMiddleware({ app });
+  app.listen(PORT, () => {
+    console.log(
+      `🚀 Server ready at http://localhost:4000${apolloServer.graphqlPath}`
+    );
+  });
 }
-
-function getLoginUser(req: express.Request) {
-  const token = req.headers["x-auth-token"] as string;
-  if (token) {
-    try {
-      return jwt.verify(token, process.env.JWT_SECRET as string);
-    } catch (error) {
-      throw Error("Session Expired!!");
-    }
-  }
-}
+startServer();

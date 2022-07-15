@@ -6,5 +6,5 @@ export const createToken = (
   expiresIn = "1h"
 ) => {
   const token = jwt.sign(user, secret, { expiresIn });
-  return { token };
+  return token;
 };
